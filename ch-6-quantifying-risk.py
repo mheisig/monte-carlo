@@ -9,6 +9,9 @@ This generates a histogram chart of the distribution of total savings for 10,000
 import numpy
 import pylab
 
+SIMULATIONS = 10000
+BREAK_EVEN = 400000
+
 # maintenance savings
 ms_lower = 10
 ms_upper = 20
@@ -45,7 +48,7 @@ def sample_binary_dist(p):
     return numpy.random.binomial(1, p)
 
 vals = []
-for i in range(0, 10000):
+for i in range(0, SIMULATIONS):
     ms = sample_normal_dist(ms_lower, ms_upper)
     ls = sample_normal_dist(ls_lower, ls_upper)
     rms = sample_normal_dist(rms_lower, rms_upper)
@@ -59,6 +62,17 @@ for i in range(0, 10000):
 
     vals.append(savings)
     
+break_even_count = len([1 for i in vals if i > BREAK_EVEN])
+break_even_perc = break_even_count / SIMULATIONS * 100
+over_100k = len([1 for i in vals if i > BREAK_EVEN - 100000])
+over_100k_perc = over_100k / SIMULATIONS * 100
+max_savings = len([1 for i in vals if i > 1000000])
+max_savings_perc = max_savings / SIMULATIONS * 100
+
+print('Number of simulations that break even: {}/{}'.format(break_even_count, SIMULATIONS))
+print('Probability of loss: {0:.2f}%'.format(100 - break_even_perc))
+print('Probability of loss > $100k: {0:.2f}%'.format(100 - over_100k_perc))
+print('Probability of savings > $1m: {}%'.format(max_savings_perc))
 
 pylab.hist(vals, bins=100)
 pylab.show()
